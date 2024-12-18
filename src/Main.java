@@ -23,8 +23,9 @@ public class Main {
                System.out.println("Это файл номер " + count);
            }
            int lineCount = 0;
-           int maxLength = 0;
-           int minLength = Integer.MAX_VALUE;
+           int googleBotRequests = 0;
+           int yandexBotRequests = 0;
+
            try {
                FileReader fileReader = new FileReader(path);
                BufferedReader reader =
@@ -37,13 +38,15 @@ public class Main {
                        throw new LineTooLongException("Строка превышает 1024 символа: " + length);
                    }
 
-                   if (length > maxLength) {
-                       maxLength = length;
+                   String userAgent = extractUserAgent(line);
+                   if (userAgent != null) {
+                       String botName = getBotName(userAgent);
+                       if ("Googlebot".equals(botName)) {
+                           googleBotRequests++;
+                       } else if ("YandexBot".equals(botName)) {
+                           yandexBotRequests++;
+                       }
                    }
-                   if (length < minLength) {
-                       minLength = length;
-                   }
-
                }
            } catch (LineTooLongException e) {
                System.err.println("Ошибка: " + e.getMessage());
@@ -54,9 +57,31 @@ public class Main {
                ex.printStackTrace();
            }
            System.out.println("Общее количество строк: " + lineCount);
-           System.out.println("Длина самой длинной строки: " + maxLength);
-           System.out.println("Длина самой короткой строки: " + (minLength == Integer.MAX_VALUE ? 0 : minLength));
-
+           double googleBotShare = (double) googleBotRequests / lineCount * 100;
+           double yandexBotShare = (double) yandexBotRequests / lineCount * 100;
+           System.out.printf("Запросы от Googlebot: %d (%.2f%%)%n", googleBotRequests, googleBotShare);
+           System.out.printf("Запросы от YandexBot: %d (%.2f%%)%n", yandexBotRequests, yandexBotShare);
        }
+    }
+    private static String extractUserAgent(String line) {
+        String[] parts = line.split("\"");
+        if (parts.length > 5) {
+            return parts[5];
+        }
+        return null;
+    }
+
+    private static String getBotName(String userAgent) {
+        int start = userAgent.indexOf('(');
+        int end = userAgent.indexOf(')');
+        if (start != -1 && end != -1 && start < end) {
+            String firstBrackets = userAgent.substring(start + 1, end);
+            String[] parts = firstBrackets.split(";");
+            if (parts.length >= 2) {
+                String fragment = parts[1].trim();
+                return fragment.split("/")[0].trim();
+            }
+        }
+        return null;
     }
 }
