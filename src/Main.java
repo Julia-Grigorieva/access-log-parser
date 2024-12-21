@@ -7,6 +7,9 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
        int count = 0;
+
+       Statistics statistics = new Statistics();
+
        while(true) {
            System.out.println("Введите путь к файлу:");
            String path = new Scanner(System.in).nextLine();
@@ -37,8 +40,10 @@ public class Main {
                    if (length > 1024) {
                        throw new LineTooLongException("Строка превышает 1024 символа: " + length);
                    }
-
-                   String userAgent = extractUserAgent(line);
+                   LogEntry logEntry = new LogEntry(line);
+                   statistics.addEntry(logEntry);
+                   System.out.println(logEntry.getDataSize());
+                  String userAgent = extractUserAgent(line);
                    if (userAgent != null) {
                        String botName = getBotName(userAgent);
                        if ("Googlebot".equals(botName)) {
@@ -61,6 +66,8 @@ public class Main {
            double yandexBotShare = (double) yandexBotRequests / lineCount * 100;
            System.out.printf("Запросы от Googlebot: %d (%.2f%%)%n", googleBotRequests, googleBotShare);
            System.out.printf("Запросы от YandexBot: %d (%.2f%%)%n", yandexBotRequests, yandexBotShare);
+           System.out.printf("Средний объем трафика за час: %.2f байт/час%n", statistics.getTotalTraffic());
+           System.out.printf("Средний объем трафика за час: %.2f байт/час%n", statistics.getTrafficRate());
        }
     }
     private static String extractUserAgent(String line) {
@@ -72,14 +79,19 @@ public class Main {
     }
 
     private static String getBotName(String userAgent) {
-        int start = userAgent.indexOf('(');
-        int end = userAgent.indexOf(')');
-        if (start != -1 && end != -1 && start < end) {
-            String firstBrackets = userAgent.substring(start + 1, end);
-            String[] parts = firstBrackets.split(";");
-            if (parts.length >= 2) {
-                String fragment = parts[1].trim();
-                return fragment.split("/")[0].trim();
+
+        int compatibleIndex = userAgent.indexOf("compatible;");
+        if (compatibleIndex != -1) {
+
+            String subUserAgent = userAgent.substring(compatibleIndex);
+
+            String[] parts = subUserAgent.split(" ");
+            for (String part : parts) {
+
+                if (part.contains("/")) {
+
+                    return part.split("/")[0].trim();
+                }
             }
         }
         return null;
