@@ -2,7 +2,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 public class Statistics {
-    private int totalTraffic;
+    private long totalTraffic;
     private OffsetDateTime minTime;
     private OffsetDateTime maxTime;
 
@@ -27,11 +27,11 @@ public class Statistics {
         if (minTime == null || maxTime == null) {
             return 0;
         }
-        long hoursDifference = maxTime.toEpochSecond() / 3600 - minTime.toEpochSecond() / 3600;
-        return hoursDifference == 0 ? totalTraffic : (double) totalTraffic / hoursDifference;
+        double hoursDifference = (maxTime.toEpochSecond() - minTime.toEpochSecond()) / 3600.0;
+        return hoursDifference == 0 ? 0 : (double) totalTraffic / hoursDifference;
     }
 
-    public double getTotalTraffic() {
+    public long getTotalTraffic() {
 
         return totalTraffic;
     }

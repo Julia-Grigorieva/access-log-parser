@@ -42,7 +42,6 @@ public class Main {
                    }
                    LogEntry logEntry = new LogEntry(line);
                    statistics.addEntry(logEntry);
-                   System.out.println(logEntry.getDataSize());
                   String userAgent = extractUserAgent(line);
                    if (userAgent != null) {
                        String botName = getBotName(userAgent);
@@ -66,7 +65,7 @@ public class Main {
            double yandexBotShare = (double) yandexBotRequests / lineCount * 100;
            System.out.printf("Запросы от Googlebot: %d (%.2f%%)%n", googleBotRequests, googleBotShare);
            System.out.printf("Запросы от YandexBot: %d (%.2f%%)%n", yandexBotRequests, yandexBotShare);
-           System.out.printf("Средний объем трафика за час: %.2f байт/час%n", statistics.getTotalTraffic());
+           System.out.printf("Полный трафик: %d байт%n", statistics.getTotalTraffic());
            System.out.printf("Средний объем трафика за час: %.2f байт/час%n", statistics.getTrafficRate());
        }
     }
