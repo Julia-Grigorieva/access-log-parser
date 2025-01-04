@@ -80,6 +80,16 @@ public class Main {
             for (Map.Entry<String, Double> entry : osStatistics.entrySet()) {
                 System.out.printf("ОС: %s, Доля: %.2f\n", entry.getKey(), entry.getValue());
             }
+            System.out.println("Несуществующие страницы:");
+            for (String page : statistics.getNonExistentPages()) {
+                System.out.println(page);
+            }
+
+            System.out.println("Статистика по браузерам:");
+            HashMap<String, Double> browserStatistics = statistics.getBrowserStatistics();
+            for (Map.Entry<String, Double> entry : browserStatistics.entrySet()) {
+                System.out.printf("Браузер: %s, Доля: %.2f\n", entry.getKey(), entry.getValue());
+            }
         }
     }
     private static String extractUserAgent(String line) {

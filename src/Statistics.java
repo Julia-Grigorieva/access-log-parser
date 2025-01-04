@@ -9,8 +9,11 @@ public class Statistics {
     private OffsetDateTime minTime;
     private OffsetDateTime maxTime;
     private HashSet<String> existingPages;
+    private HashSet<String> nonExistentPages;
     private HashMap<String, Integer> osFrequency;
+    private HashMap<String, Integer> browserFrequency;
     private int totalOsCount;
+    private int totalBrowserCount;
 
 
     public Statistics() {
@@ -18,8 +21,11 @@ public class Statistics {
         minTime = null;
         maxTime = null;
         existingPages = new HashSet<>();
+        nonExistentPages = new HashSet<>();
         osFrequency = new HashMap<>();
+        browserFrequency = new HashMap<>();
         totalOsCount = 0;
+        totalBrowserCount = 0;
     }
 
     public void addEntry(LogEntry entry) {
@@ -31,13 +37,20 @@ public class Statistics {
         if (maxTime == null || entry.getDateTime().isAfter(maxTime)) {
             maxTime = entry.getDateTime();
         }
+
         if (entry.getResponseCode() == 200) {
             existingPages.add(entry.getPath());
+        } else if (entry.getResponseCode() == 404) {
+            nonExistentPages.add(entry.getPath());
         }
 
         String os = entry.getUserAgent().getOs();
         osFrequency.put(os, osFrequency.getOrDefault(os, 0) + 1);
         totalOsCount++;
+
+        String browser = entry.getUserAgent().getBrowser();
+        browserFrequency.put(browser, browserFrequency.getOrDefault(browser, 0) + 1);
+        totalBrowserCount++;
     }
 
     public double getTrafficRate() {
@@ -63,5 +76,17 @@ public class Statistics {
             osStats.put(entry.getKey(), share);
         }
         return osStats;
+    }
+    public HashSet<String> getNonExistentPages() {
+        return nonExistentPages;
+    }
+
+    public HashMap<String, Double> getBrowserStatistics() {
+        HashMap<String, Double> browserStats = new HashMap<>();
+        for (Map.Entry<String, Integer> entry : browserFrequency.entrySet()) {
+            double share = (double) entry.getValue() / totalBrowserCount;
+            browserStats.put(entry.getKey(), share);
+        }
+        return browserStats;
     }
 }
