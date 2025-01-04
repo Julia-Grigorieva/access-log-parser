@@ -25,7 +25,12 @@ public class LogEntry {
         this.responseCode = parseInt(parts[8]);
         this.dataSize = parseInt(parts[9]);
         this.referer = parts[10].equals("-") ? null : parts[10];
-        this.userAgent = new UserAgent(parts[11]);
+
+        StringBuilder userAgentBuilder = new StringBuilder();
+        for (int i = 11; i < parts.length; i++) {
+            userAgentBuilder.append(parts[i]).append(" ");
+        }
+        this.userAgent = new UserAgent(userAgentBuilder.toString().trim());
     }
 
     private OffsetDateTime parseDateTime(String dateTimeStr) {
