@@ -90,6 +90,9 @@ public class Main {
             for (Map.Entry<String, Double> entry : browserStatistics.entrySet()) {
                 System.out.printf("Браузер: %s, Доля: %.2f\n", entry.getKey(), entry.getValue());
             }
+            System.out.printf("Среднее количество посещений за час: %.2f%n", statistics.getAverageVisitsPerHour());
+            System.out.printf("Среднее количество ошибочных запросов за час: %.2f%n", statistics.getAverageErrorRequestsPerHour());
+            System.out.printf("Средняя посещаемость одним пользователем: %.2f%n", statistics.getAverageVisitsPerUser ());
         }
     }
     private static String extractUserAgent(String line) {

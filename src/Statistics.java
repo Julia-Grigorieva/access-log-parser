@@ -14,6 +14,9 @@ public class Statistics {
     private HashMap<String, Integer> browserFrequency;
     private int totalOsCount;
     private int totalBrowserCount;
+    private int totalUserVisits;
+    private int totalErrorRequests;
+    private HashSet<String> uniqueUsers;
 
 
     public Statistics() {
@@ -26,6 +29,9 @@ public class Statistics {
         browserFrequency = new HashMap<>();
         totalOsCount = 0;
         totalBrowserCount = 0;
+        totalUserVisits = 0;
+        totalErrorRequests = 0;
+        uniqueUsers = new HashSet<>();
     }
 
     public void addEntry(LogEntry entry) {
@@ -40,8 +46,13 @@ public class Statistics {
 
         if (entry.getResponseCode() == 200) {
             existingPages.add(entry.getPath());
-        } else if (entry.getResponseCode() == 404) {
+            if (!entry.getUserAgent().isBot()) {
+                totalUserVisits++;
+                uniqueUsers.add(entry.getIpAddress());
+            }
+        } else if (entry.getResponseCode() >= 400 && entry.getResponseCode() < 600) {
             nonExistentPages.add(entry.getPath());
+            totalErrorRequests++;
         }
 
         String os = entry.getUserAgent().getOs();
@@ -88,5 +99,27 @@ public class Statistics {
             browserStats.put(entry.getKey(), share);
         }
         return browserStats;
+    }
+    public double getAverageVisitsPerHour() {
+        if (minTime == null || maxTime == null || totalUserVisits == 0) {
+            return 0;
+        }
+        double hoursDifference = (maxTime.toEpochSecond() - minTime.toEpochSecond()) / 3600.0;
+        return hoursDifference == 0 ? 0 : (double) totalUserVisits / hoursDifference;
+    }
+
+    public double getAverageErrorRequestsPerHour() {
+        if (minTime == null || maxTime == null || totalErrorRequests == 0) {
+            return 0;
+        }
+        double hoursDifference = (maxTime.toEpochSecond() - minTime.toEpochSecond()) / 3600.0;
+        return hoursDifference == 0 ? 0 : (double) totalErrorRequests / hoursDifference;
+    }
+
+    public double getAverageVisitsPerUser () {
+        if (uniqueUsers.isEmpty()) {
+            return 0;
+        }
+        return (double) totalUserVisits / uniqueUsers.size();
     }
 }

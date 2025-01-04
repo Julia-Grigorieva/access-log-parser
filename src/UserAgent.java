@@ -43,4 +43,7 @@ public class UserAgent {
     public String getUserAgentStr() {
         return userAgentStr;
     }
+    public boolean isBot() {
+        return getUserAgentStr().toLowerCase().contains("bot");
+    }
 }
