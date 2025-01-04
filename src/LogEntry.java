@@ -2,6 +2,8 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.lang.Integer.parseInt;
 
@@ -24,7 +26,14 @@ public class LogEntry {
         this.path = parts[6];
         this.responseCode = parseInt(parts[8]);
         this.dataSize = parseInt(parts[9]);
-        this.referer = parts[10].equals("-") ? null : parts[10];
+        Pattern pattern = Pattern.compile("\"(https?://[^\"]+)\"");
+        Matcher matcher = pattern.matcher(logEntryStr);
+
+        if (matcher.find()) {
+            this.referer = matcher.group(1); // Извлекаем реферер
+        } else {
+            this.referer = null; // Если реферер не найден
+        }
 
         StringBuilder userAgentBuilder = new StringBuilder();
         for (int i = 11; i < parts.length; i++) {

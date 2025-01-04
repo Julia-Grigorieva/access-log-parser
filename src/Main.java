@@ -45,6 +45,7 @@ public class Main {
                     LogEntry logEntry = new LogEntry(line);
                     statistics.addEntry(logEntry);
                     String userAgent = extractUserAgent(line);
+
                     if (userAgent != null) {
                         String botName = getBotName(userAgent);
                         if ("Googlebot".equals(botName)) {
@@ -69,7 +70,12 @@ public class Main {
             System.out.printf("Запросы от YandexBot: %d (%.2f%%)%n", yandexBotRequests, yandexBotShare);
             System.out.printf("Полный трафик: %d байт%n", statistics.getTotalTraffic());
             System.out.printf("Средний объем трафика за час: %.2f байт/час%n", statistics.getTrafficRate());
-
+            System.out.printf("Пик посещаемости в секунду: %d%n", statistics.getPeakVisitsPerSecond());
+            System.out.printf("Максимальное количество посещений одним пользователем: %d%n", statistics.getMaxVisitsPerUser ());
+            System.out.println("Доменные имена рефереров: ");
+            for (String domain : statistics.getReferrerDomains()) {
+                System.out.println(domain);
+            }
             System.out.println("Существующие страницы:");
             for (String page : statistics.getExistingPages()) {
                 System.out.println(page);
